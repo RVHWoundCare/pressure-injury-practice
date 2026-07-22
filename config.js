@@ -9,3 +9,4 @@ window.APP_CONFIG = Object.freeze({
   supabaseUrl: "https://ouxbcxmtmvmcpwjcouds.supabase.co",
   supabasePublishableKey: "sb_publishable_XowgjE6XeglAJmOd06u_fw__D_1iapZ"
 });
+
