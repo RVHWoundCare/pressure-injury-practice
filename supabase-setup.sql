@@ -279,8 +279,8 @@ grant select on table public.workplaces to service_role;
 
 insert into public.workplaces (id, display_name, code_hash, active)
 values
-  ('rvh', 'RVH', 'bf3a833a8d3d04275edafc09d508101567bca40bdea2ee208820f06a0a94e17f', true),
-  ('osmh', 'OSMH', '8f08a1332dc8434addad0f9104d68c75d3e6a5412af24820671f50f12c5ebad7', true)
+  ('rvh', 'Royal Victoria Regional Health Centre', 'bf3a833a8d3d04275edafc09d508101567bca40bdea2ee208820f06a0a94e17f', true),
+  ('osmh', 'Orillia Soldiers'' Memorial Hospital', '8f08a1332dc8434addad0f9104d68c75d3e6a5412af24820671f50f12c5ebad7', true)
 on conflict (id) do update set
   display_name = excluded.display_name,
   code_hash = excluded.code_hash,
