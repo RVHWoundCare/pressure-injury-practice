@@ -21,7 +21,7 @@ header{position:sticky;top:0;z-index:20;background:#fff;border-bottom:1px solid 
 </head>
 <body>
 <a class="skip" href="#main">Skip to main content</a>
-<header class="noprint"><div class="shell head"><span class="logo" aria-hidden="true">PI</span><div class="brand"><strong>Pressure Injury Staging Practice</strong><small id="org">Royal Victoria Regional Health Centre / Orillia Soldiers' Memorial Hospital</small></div></div></header>
+<header class="noprint"><div class="shell head"><span class="logo" aria-hidden="true">PI</span><div class="brand"><strong>Pressure Injury Staging Practice</strong><small id="org" hidden></small></div></div></header>
 <main id="main" class="shell" tabindex="-1"><section id="start" class="screen"></section><section id="quiz" class="screen" hidden></section><section id="leaderboard" class="screen" hidden></section><section id="results" class="screen" hidden></section><section id="review" class="screen" hidden></section></main>
 <footer><div class="shell"><p>All wound images in this activity are AI-generated clinical simulations and do not depict real patients. Synthetic images may not capture every feature encountered in clinical practice. Pressure-injury classification requires direct patient assessment, clinical judgment, and compliance with current organizational policy.</p><p>This activity is for professional education only. Do not use it as the sole basis for diagnosis, documentation, treatment, or patient-care decisions.</p><p class="noprint"><a href="admin.html">Administrator Panel</a></p></div></footer>
 <div id="imageDialog" class="backdrop" role="dialog" aria-modal="true" aria-labelledby="imageTitle" hidden><div class="modal"><div class="modalhead"><h2 id="imageTitle">Enlarged clinical simulation</h2><button id="imageClose" class="icon" type="button" aria-label="Close enlarged image">×</button></div><img id="modalImage" alt="Enlarged synthetic clinical simulation of the assessment area."><p class="muted">AI-generated clinical simulation — not a patient photograph.</p></div></div>
@@ -42,9 +42,8 @@ header{position:sticky;top:0;z-index:20;background:#fff;border-bottom:1px solid 
    in-app control during testing.
    ===================================================================== */
 const APP_NAME="Pressure Injury Staging Practice";
-const ORGANIZATION_NAME="Royal Victoria Regional Health Centre / Orillia Soldiers' Memorial Hospital";
 const WORKPLACE_NAMES=Object.freeze({rvh:"Royal Victoria Regional Health Centre",osmh:"Orillia Soldiers' Memorial Hospital"});
-const APP_VERSION="2.1.0";
+const APP_VERSION="2.1.1";
 const STORAGE_VERSION="4";
 const CONTENT_VALIDATED=false;
 const RANDOMIZE_CASES=true;
@@ -161,8 +160,8 @@ function disclaim(box){box.append(E("div",{class:"notice"},[P(DISC),P(EDU)]))}
 function details(title,content){const d=E("details"),b=E("div");d.append(E("summary",{text:title}));content.forEach(x=>b.append(typeof x==="string"?P(x):x));d.append(b);return d}
 const find=id=>CASE_LIBRARY.find(c=>c.id===id),current=()=>state?find(state.caseOrder[state.currentIndex]):null,pct=(a,b)=>b?Math.round(a/b*100):0;
 function duration(ms){const m=Math.floor(ms/60000),s=Math.floor(ms%60000/1000);return m?`${m} min ${s} sec`:`${s} sec`}
-function workplaceName(id){return WORKPLACE_NAMES[String(id||"").toLowerCase()]||ORGANIZATION_NAME}
-function updateOrganizationName(){$("#org").textContent=participantProfile?workplaceName(participantProfile.workplace_id):ORGANIZATION_NAME}
+function workplaceName(id){return WORKPLACE_NAMES[String(id||"").toLowerCase()]||""}
+function updateOrganizationName(){const org=$("#org"),name=participantProfile?workplaceName(participantProfile.workplace_id):"";org.textContent=name;org.hidden=!name}
 
 /* Supabase provides participant accounts, resumable attempts, images, and leaderboard rows. */
 function leaderboardConfigured(){return SUPABASE_URL.startsWith("https://")&&SUPABASE_PUBLISHABLE_KEY&&!SUPABASE_URL.includes("YOUR_")&&!SUPABASE_PUBLISHABLE_KEY.includes("YOUR_")&&!!window.supabase?.createClient}
@@ -192,11 +191,11 @@ function accountForms(){
   loginUser.input.maxLength=24;loginPassword.input.minLength=10;loginPassword.input.maxLength=72;loginMessage.role="alert";
   loginForm.append(E("h2",{text:"Resume an existing account"}),loginUser.box,loginPassword.box,loginButton,loginMessage);
   loginForm.onsubmit=async event=>{event.preventDefault();loginMessage.textContent="";loginButton.disabled=true;loginButton.textContent="Signing in…";try{await participantAccountRequest("login",loginUser.input.value,loginPassword.input.value);say("Signed in. Your latest activity has been restored.");if(state)await resumeSession(state);else renderStart()}catch(error){loginMessage.textContent=error.message;say(error.message)}finally{loginButton.disabled=false;loginButton.textContent="Sign in and resume"}};
-  wrap.append(createForm,E("div",{class:"account-divider",text:"Already registered?"}),loginForm,P("Participant passwords are handled by Supabase Auth and are never stored in this website or GitHub.","password-note"));return wrap
+  wrap.append(createForm,E("div",{class:"account-divider",text:"Already registered?"}),loginForm,P("Participant passwords are never stored by this website or its web host. Sign-in information is handled securely by an external authentication provider.","password-note"));return wrap
 }
 function renderStart(){
   updateOrganizationName();const s=$("#start");s.replaceChildren();
-  s.append(E("div",{class:"hero"},[P("Clinical education prototype","eyebrow"),E("h1",{id:"startTitle",text:APP_NAME}),P("An image-based learning activity for nurses","subtitle"),P("Practice classifying fictional pressure-injury cases across eight assessment domains, with immediate feedback and a personalized review plan.","lede"),E("span",{class:"pill",text:"40 cases • approximately 10–15 minutes"})]));
+  s.append(E("div",{class:"hero"},[P("Clinical education activity","eyebrow"),E("h1",{id:"startTitle",text:APP_NAME}),P("An image-based learning activity for nurses","subtitle"),P("Practice classifying fictional pressure-injury cases across eight assessment domains, with immediate feedback and a personalized review plan.","lede"),E("span",{class:"pill",text:"40 cases • approximately 10–15 minutes"})]));
   const a=E("div",{class:"card stack"});a.append(E("div",{class:"notice graphic"},P("Content notice: simulated wound imagery may be graphic. This prototype uses restrained schematic simulations.")),E("div",{class:"notice"},P(`${SIM_LABEL} Every visual is synthetic and does not depict a real patient.`)));disclaim(a);
   const publicBoard=E("button",{class:"btn secondary",type:"button",text:"View leaderboard",onclick:renderPublicLeaderboard});
   if(!leaderboardConfigured())a.append(E("div",{class:"notice warning"},P("Administrator note: account and leaderboard setup is incomplete.")),publicBoard);
@@ -262,7 +261,7 @@ function openConfirm(t,m,fn){lastFocus=document.activeElement;confirmFn=fn;$("#c
 function closeConfirm(run=false){$("#confirmDialog").hidden=true;document.body.style.overflow="";const fn=confirmFn;confirmFn=null;if(run&&fn)fn();else lastFocus?.focus()}
 function trap(e,m){if(e.key!=="Tab")return;const f=[...m.querySelectorAll('button:not([disabled]),[href],input:not([disabled]),[tabindex]:not([tabindex="-1"])')];if(!f.length)return;if(e.shiftKey&&document.activeElement===f[0]){e.preventDefault();f[f.length-1].focus()}else if(!e.shiftKey&&document.activeElement===f[f.length-1]){e.preventDefault();f[0].focus()}}
 $("#imageClose").onclick=closeImage;$("#confirmNo").onclick=()=>closeConfirm(false);$("#confirmYes").onclick=()=>closeConfirm(true);$("#imageDialog").onclick=e=>{if(e.target.id==="imageDialog")closeImage()};$("#confirmDialog").onclick=e=>{if(e.target.id==="confirmDialog")closeConfirm(false)};$("#imageDialog").onkeydown=e=>e.key==="Escape"?closeImage():trap(e,$("#imageDialog"));$("#confirmDialog").onkeydown=e=>e.key==="Escape"?closeConfirm(false):trap(e,$("#confirmDialog"));
-async function initializeApp(){document.title=APP_NAME;$("#org").textContent=ORGANIZATION_NAME;caseImagesReady=loadCaseImageOverrides();renderStart();await Promise.all([caseImagesReady,loadParticipantAccount()]);renderStart()}
+async function initializeApp(){document.title=APP_NAME;updateOrganizationName();caseImagesReady=loadCaseImageOverrides();renderStart();await Promise.all([caseImagesReady,loadParticipantAccount()]);renderStart()}
 initializeApp();
 </script>
 </body>
