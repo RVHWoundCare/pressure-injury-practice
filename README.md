@@ -6,9 +6,11 @@ This repository contains a static 40-case learning activity hosted with GitHub P
 - unique participant usernames and password-protected resume access;
 - a workplace-code enrollment gate validated only by a Supabase Edge Function;
 - automatic progress saving after every answer;
+- participant-specific hospital branding after account creation or sign-in;
 - a public top-50 leaderboard that is available from the homepage;
 - complete case-level attempt records available only to allowlisted administrators;
-- an administrator page that shows each case description and detailed image-generation specification beside the upload controls; and
+- an administrator page that shows each case description and detailed image-generation specification beside the upload controls;
+- administrator-only participant summaries by assessment domain, medical-device recognition, Fitzpatrick phototype, strongest domains, and prioritized review needs; and
 - administrator-uploaded AI-generated image overrides with built-in simulations retained as fallbacks.
 
 ## Security model
@@ -36,6 +38,7 @@ supabase/
       index.ts
   migrations/
     20260721_participant_accounts_and_results.sql
+    20260722040821_expand_workplace_names.sql
 ```
 
 ## Supabase database setup
@@ -119,7 +122,7 @@ Administrator accounts continue to use Supabase email-and-password Auth.
 
 The image uploader shows the selected case's anatomical location, expected classification, simulated phototype, clinical context, key findings, and full image-generation specification. Use only approved AI-generated simulations with no real patient information.
 
-The completed-results section lists every finished attempt with alias, workplace, score, time, completion date, and all 40 participant answers. This data is protected by the administrator allowlist and is not exposed on the public leaderboard.
+The completed-results section lists every finished attempt with alias, workplace, score, time, completion date, and all 40 participant answers. A separate expandable summary reproduces the participant's results by domain, medical-device recognition, Fitzpatrick phototype, three strongest domains, and prioritized review plan. This data is protected by the administrator allowlist and is not exposed on the public leaderboard.
 
 ## Verification checklist
 
@@ -128,7 +131,7 @@ The completed-results section lists every finished attempt with alias, workplace
 - Confirm a duplicate username is rejected regardless of letter case.
 - Answer several cases, sign out, sign in again, and confirm the same attempt resumes.
 - Complete a test attempt and confirm the public leaderboard shows only alias, score, duration, and completion date.
-- Sign in as an administrator and confirm the full 40-response result is visible.
+- Sign in as an administrator and confirm both expandable result summaries and the full 40-response result are visible.
 - Select several cases in the image uploader and verify that their guidance changes.
 - Upload and remove a synthetic test image, confirming that the built-in image returns.
 
